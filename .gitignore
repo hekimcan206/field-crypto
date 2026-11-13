@@ -31,3 +31,4 @@ BenchmarkDotNet.Artifacts/
 *.db
 *.db-wal
 *.db-shm
+.devkms/

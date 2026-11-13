@@ -1,0 +1,213 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build-test:
+    name: build & test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore
+
+      # Package versions are pinned and updated by hand, so a known vulnerability in any direct or
+      # transitive package fails the build. Fix it with a pinned upgrade in Directory.Packages.props.
+      - name: Audit for vulnerable packages
+        run: |
+          set -o pipefail
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::error::Known-vulnerable NuGet packages found (see the list above)"
+            exit 1
+          fi
+
+      - name: Format check
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build (warnings are errors)
+        run: dotnet build --no-restore --configuration Release
+
+      # Unit, property, golden-vector and OCI adapter tests (the development KMS runs in-process on Kestrel), then
+      # integration tests against PostgreSQL 17 started by Testcontainers on the runner's Docker engine.
+      - name: Test
+        run: >
+          dotnet test --no-build --configuration Release
+          --coverage --coverage-output-format cobertura
+          --results-directory "${{ github.workspace }}/TestResults"
+
+      - name: Coverage summary
+        if: always()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.12
+        with:
+          reports: TestResults/**/*.cobertura.xml
+          targetdir: coverage
+          reporttypes: MarkdownSummaryGithub
+          assemblyfilters: "-*Tests*;-FieldCrypto.Benchmarks;-FieldCrypto.Demo"
+          filefilters: "-*/obj/*"
+
+      - name: Publish coverage to job summary
+        if: always()
+        run: |
+          if [ -f coverage/SummaryGithub.md ]; then
+            cat coverage/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No coverage report produced."
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 7
+
+  packages:
+    name: NuGet packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      # The four libraries are packable; a throwaway console app consumes them from the local feed, which catches a
+      # package that builds but is missing a dependency or an assembly.
+      - name: Pack and consume
+        run: |
+          for p in FieldCrypto FieldCrypto.Oci FieldCrypto.EntityFrameworkCore FieldCrypto.Dapper; do
+            dotnet pack "src/$p" --configuration Release --output nupkg
+          done
+          mkdir consumer && cd consumer
+          dotnet new console --framework net10.0 --name Consumer --output .
+          cat > nuget.config <<'XML'
+          <configuration>
+            <packageSources>
+              <add key="local" value="../nupkg" />
+              <add key="nuget" value="https://api.nuget.org/v3/index.json" />
+            </packageSources>
+          </configuration>
+          XML
+          dotnet add package FieldCrypto.EntityFrameworkCore --version 1.0.0
+          dotnet add package FieldCrypto.Dapper --version 1.0.0
+          dotnet add package FieldCrypto.Oci --version 1.0.0
+          cat > Program.cs <<'CS'
+          using FieldCrypto;
+          using FieldCrypto.Keys;
+          using FieldCrypto.Kms;
+          using var ring = new KeyRing(LocalKeyEncryptionService.CreateEphemeral(), new InMemoryDataKeyStore());
+          var encryptor = new FieldEncryptor(ring);
+          var context = new EncryptionContext("patients", "national_id");
+          var plaintext = encryptor.Decrypt(encryptor.Encrypt("10000000146", context), context);
+          Console.WriteLine(plaintext == "10000000146" ? "round trip ok" : "round trip FAILED");
+          return plaintext == "10000000146" ? 0 : 1;
+          CS
+          dotnet run
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nupkg
+          path: nupkg/*.nupkg
+          retention-days: 14
+
+  container:
+    name: container images
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build development KMS image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: src/FieldCrypto.DevKms/Dockerfile
+          push: false
+          load: true
+          tags: fieldcrypto-devkms:ci
+          cache-from: type=gha,scope=devkms
+          cache-to: type=gha,mode=max,scope=devkms
+
+      - name: Build demo image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: samples/FieldCrypto.Demo/Dockerfile
+          push: false
+          load: true
+          tags: fieldcrypto-demo:ci
+          cache-from: type=gha,scope=demo
+          cache-to: type=gha,mode=max,scope=demo
+
+      - name: Verify both images run as non-root
+        run: |
+          for image in fieldcrypto-devkms:ci fieldcrypto-demo:ci; do
+            user=$(docker image inspect "$image" --format '{{.Config.User}}')
+            echo "$image user: ${user}"
+            test -n "${user}" && test "${user}" != "0" && test "${user}" != "root"
+          done
+
+  compose-demo:
+    name: docker compose demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      # The README promises `docker compose up` runs the whole demo with zero manual steps; this job keeps it true.
+      - name: Run the demo
+        run: |
+          set +e
+          docker compose up --build --abort-on-container-exit --exit-code-from demo 2>&1 | tee compose.log
+          code=${PIPESTATUS[0]}
+          set -e
+          test "${code}" = "0"
+
+      - name: Every claim of the demo holds
+        run: |
+          grep -q '"plaintextHits":0' compose.log
+          grep -q '"nationalIdMatches":1' compose.log
+          grep -q '"crossColumnCopyDetected":true,"rowCopyDetectedDapper":true,"rowCopyDetectedEfCore":false' compose.log
+          grep -q '"dataRowsChangedByKekRotation":0' compose.log
+          grep -q '"rowsReencrypted":2200,"rowsLeftOnRetiredKeys":0,"failures":\[\]' compose.log
+          grep -q 'cold-cache process decrypted 2,000 patients after the rotation' compose.log
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Clean up
+        if: always()
+        run: docker compose down -v
