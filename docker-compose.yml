@@ -1,0 +1,56 @@
+# docker compose up: PostgreSQL, the development KMS (OCI Vault API) and the demo, with zero manual steps.
+# The demo exits when it finishes; its last line is a JSON summary, and the exit code is non-zero if any check failed.
+# All values below are development-only. All data is synthetic.
+name: field-crypto
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: clinic
+      POSTGRES_USER: clinic
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinic-dev-only}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-58962}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic -d clinic"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  devkms:
+    build:
+      context: .
+      dockerfile: src/FieldCrypto.DevKms/Dockerfile
+    image: fieldcrypto-devkms:dev
+    environment:
+      DevKms__KeyIds__0: ocid1.key.oc1.dev.fieldcrypto.demo
+    ports:
+      - "127.0.0.1:${DEVKMS_PORT:-58961}:8080"
+    volumes:
+      # The KMS writes a fresh client API key here on first start and trusts it; the demo signs with it.
+      - devkms-client:/client
+      - devkms-state:/state
+
+  demo:
+    build:
+      context: .
+      dockerfile: samples/FieldCrypto.Demo/Dockerfile
+    image: fieldcrypto-demo:dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      devkms:
+        condition: service_started
+    environment:
+      FC_POSTGRES: Host=postgres;Database=clinic;Username=clinic;Password=${POSTGRES_PASSWORD:-clinic-dev-only};GSS Encryption Mode=Disable
+      FC_KMS_URL: http://devkms:8080
+      FC_KMS_CLIENT_KEY_DIR: /client
+      FC_KMS_KEY_OCID: ocid1.key.oc1.dev.fieldcrypto.demo
+      FC_PATIENTS: ${FC_PATIENTS:-2000}
+    volumes:
+      - devkms-client:/client:ro
+
+volumes:
+  devkms-client:
+  devkms-state:

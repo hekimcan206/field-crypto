@@ -27,6 +27,12 @@ public sealed class DemoRunner(NpgsqlDataSource dataSource, IKeyEncryptionServic
     public async Task<DemoSummary> RunAsync(DemoOptions options, CancellationToken cancellationToken = default)
     {
         await ClinicSchema.CreateAsync(dataSource, cancellationToken);
+        // Every run starts empty, so `docker compose up` can be repeated against the same database.
+        await using (var reset = dataSource.CreateCommand("TRUNCATE lab_results, patients, field_crypto_data_keys"))
+        {
+            await reset.ExecuteNonQueryAsync(cancellationToken);
+        }
+
         var store = new PostgresDataKeyStore(dataSource);
         using var ring = new KeyRing(kms, store, new KeyRingOptions { MaxMessagesPerDataKey = options.MaxMessagesPerDataKey });
         await ring.InitializeAsync(cancellationToken);
