@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>FieldCrypto.Dapper</PackageId>
+    <Description>Dapper and PostgreSQL integration for FieldCrypto: encrypted and blind-index parameters, a PostgreSQL data key store, and an online re-encryption job for retired data keys.</Description>
+    <PackageTags>encryption;dapper;postgresql;blind-index;key-rotation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Npgsql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FieldCrypto\FieldCrypto.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -2,6 +2,8 @@
   <Folder Name="/src/">
     <Project Path="src/FieldCrypto/FieldCrypto.csproj" />
     <Project Path="src/FieldCrypto.Oci/FieldCrypto.Oci.csproj" />
+    <Project Path="src/FieldCrypto.EntityFrameworkCore/FieldCrypto.EntityFrameworkCore.csproj" />
+    <Project Path="src/FieldCrypto.Dapper/FieldCrypto.Dapper.csproj" />
     <Project Path="src/FieldCrypto.DevKms/FieldCrypto.DevKms.csproj" />
   </Folder>
   <Folder Name="/tests/">
