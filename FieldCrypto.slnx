@@ -11,5 +11,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FieldCrypto.UnitTests/FieldCrypto.UnitTests.csproj" />
+    <Project Path="tests/FieldCrypto.IntegrationTests/FieldCrypto.IntegrationTests.csproj" />
   </Folder>
 </Solution>
