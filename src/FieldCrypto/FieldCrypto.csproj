@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>FieldCrypto</PackageId>
+    <Description>Field-level envelope encryption for .NET: AES-256-GCM data keys wrapped by a pluggable KMS, key rotation without touching data rows, and blind indexes for equality search.</Description>
+    <PackageTags>encryption;envelope-encryption;aes-gcm;kms;blind-index;field-level-encryption</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FieldCrypto.UnitTests" />
+    <InternalsVisibleTo Include="FieldCrypto.Benchmarks" />
+  </ItemGroup>
+
+</Project>
