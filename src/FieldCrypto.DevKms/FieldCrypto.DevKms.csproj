@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <Description>Development KMS that serves the OCI Vault crypto and key-version API subset FieldCrypto uses, with OCI request-signature checks. Not a KMS: keys live in this process.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FieldCrypto.Oci\FieldCrypto.Oci.csproj" />
+  </ItemGroup>
+
+</Project>

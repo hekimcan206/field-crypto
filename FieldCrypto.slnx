@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/FieldCrypto/FieldCrypto.csproj" />
+    <Project Path="src/FieldCrypto.Oci/FieldCrypto.Oci.csproj" />
+    <Project Path="src/FieldCrypto.DevKms/FieldCrypto.DevKms.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FieldCrypto.UnitTests/FieldCrypto.UnitTests.csproj" />

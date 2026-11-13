@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>FieldCrypto.Oci</PackageId>
+    <Description>OCI Vault adapter for FieldCrypto: wraps data keys with an OCI Vault master encryption key over the KMS crypto API, with OCI API-key request signing and no OCI SDK dependency.</Description>
+    <PackageTags>encryption;kms;oci;oracle-cloud;vault;envelope-encryption</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FieldCrypto\FieldCrypto.csproj" />
+  </ItemGroup>
+
+</Project>

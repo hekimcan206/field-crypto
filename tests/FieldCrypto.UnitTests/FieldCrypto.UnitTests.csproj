@@ -16,10 +16,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FieldCrypto\FieldCrypto.csproj" />
+    <ProjectReference Include="..\..\src\FieldCrypto.Oci\FieldCrypto.Oci.csproj" />
+    <ProjectReference Include="..\..\src\FieldCrypto.DevKms\FieldCrypto.DevKms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The OCI adapter tests host the development KMS on Kestrel in-process. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Golden\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Oci\Fixtures\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
