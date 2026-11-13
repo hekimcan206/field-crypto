@@ -6,6 +6,9 @@
     <Project Path="src/FieldCrypto.Dapper/FieldCrypto.Dapper.csproj" />
     <Project Path="src/FieldCrypto.DevKms/FieldCrypto.DevKms.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/FieldCrypto.Demo/FieldCrypto.Demo.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FieldCrypto.UnitTests/FieldCrypto.UnitTests.csproj" />
   </Folder>
