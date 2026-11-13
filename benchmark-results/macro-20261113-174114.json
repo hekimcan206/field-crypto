@@ -1,0 +1,188 @@
+{
+  "environment": {
+    "os": "Microsoft Windows 10.0.26200",
+    "dotnet": "10.0.12",
+    "cpus": 16,
+    "postgres": "postgres:17-alpine (Testcontainers, Docker Desktop)",
+    "patients": 10000,
+    "runs": 3
+  },
+  "kmsLatency": {
+    "localUnwrap": {
+      "P50Ms": 0.0056,
+      "P95Ms": 0.0093,
+      "P99Ms": 0.0139,
+      "MeanMs": 0.006016333333333338
+    },
+    "ociDevKmsAsync": {
+      "P50Ms": 1.6684,
+      "P95Ms": 3.0713,
+      "P99Ms": 5.1566,
+      "MeanMs": 1.9442806666666665
+    },
+    "ociDevKmsSync": {
+      "P50Ms": 1.6334,
+      "P95Ms": 2.2739,
+      "P99Ms": 3.1118,
+      "MeanMs": 1.739667666666667
+    }
+  },
+  "writePath": {
+    "encryptedPatientsPerSecond": 3013.7387913026873,
+    "plaintextPatientsPerSecond": 14466.219641191461,
+    "encryptedRuns": [
+      1769.905771809624,
+      3013.7387913026873,
+      6387.3948594884905
+    ],
+    "plaintextRuns": [
+      4077.810163746098,
+      14892.522896137014,
+      14466.219641191461
+    ],
+    "kmsWrapsWithCache": 2,
+    "noCachePatients": 300,
+    "noCachePatientsPerSecond": 72.22441744326574,
+    "noCacheRuns": [
+      65.81935220593559,
+      72.22441744326574,
+      80.02613760355649
+    ],
+    "kmsWrapsWithoutCache": 1429
+  },
+  "read": {
+    "firstReadMs": 395.7473,
+    "warmReadMs": 314.7194,
+    "plaintextWarmReadMs": 60.4872,
+    "firstRuns": [
+      780.6658,
+      304.605,
+      395.7473
+    ],
+    "warmRuns": [
+      314.7194,
+      294.5617,
+      524.0455
+    ],
+    "plaintextRuns": [
+      60.4872,
+      165.4326,
+      29.2026
+    ],
+    "kmsUnwrapsOnFirstRead": 1
+  },
+  "lookup": {
+    "blindIndex": {
+      "P50Ms": 1.133,
+      "P95Ms": 8.4442,
+      "P99Ms": 14.804,
+      "MeanMs": 2.3318326666666653
+    },
+    "plaintextIndex": {
+      "P50Ms": 0.6681,
+      "P95Ms": 1.5143,
+      "P99Ms": 2.0117,
+      "MeanMs": 0.8512196666666669
+    },
+    "meanCandidates": 1.1515151515151516,
+    "expectedFalsePositives": 0.152587890625
+  },
+  "storage": {
+    "nationalIdEncryptedBytes": 57,
+    "nationalIdPlainBytes": 12,
+    "encryptedTableBytes": 5242880,
+    "plainTableBytes": 2301952
+  },
+  "rewrapBreakdown": {
+    "unwrap": {
+      "P50Ms": 1.3926,
+      "P95Ms": 1.7751,
+      "P99Ms": 2.1989,
+      "MeanMs": 1.4626290000000004
+    },
+    "wrap": {
+      "P50Ms": 1.3532,
+      "P95Ms": 2.1473,
+      "P99Ms": 3.1371,
+      "MeanMs": 1.4981610000000003
+    },
+    "update": {
+      "P50Ms": 0.8859,
+      "P95Ms": 1.98,
+      "P99Ms": 2.2555,
+      "MeanMs": 1.0198060000000004
+    }
+  },
+  "rotation": {
+    "rewrapKeys": 1000,
+    "rewrapMs": 4508.4444,
+    "rewrapRuns": [
+      4018.0215,
+      4508.4444,
+      5426.5788
+    ],
+    "datasetDataKeys": 2,
+    "datasetRewrapMs": 13.812,
+    "datasetRewrapRuns": [
+      23.7527,
+      13.7829,
+      13.812
+    ],
+    "reencryptRowsPerSecond": 8626.226800409988,
+    "reencryptRuns": [
+      7635.747362135627,
+      8626.226800409988,
+      10027.977053180668
+    ]
+  },
+  "falsePositiveSweep": [
+    {
+      "bits": 8,
+      "meanFalsePositives": 391.315,
+      "expectedFalsePositives": 390.62109375,
+      "distinctValues": 256,
+      "largestBucket": 443,
+      "rowsAloneInBucket": 0
+    },
+    {
+      "bits": 12,
+      "meanFalsePositives": 24.565,
+      "expectedFalsePositives": 24.413818359375,
+      "distinctValues": 4096,
+      "largestBucket": 44,
+      "rowsAloneInBucket": 0
+    },
+    {
+      "bits": 16,
+      "meanFalsePositives": 1.475,
+      "expectedFalsePositives": 1.5258636474609375,
+      "distinctValues": 51342,
+      "largestBucket": 9,
+      "rowsAloneInBucket": 21835
+    },
+    {
+      "bits": 20,
+      "meanFalsePositives": 0.1299999999999999,
+      "expectedFalsePositives": 0.0953664779663086,
+      "distinctValues": 95381,
+      "largestBucket": 4,
+      "rowsAloneInBucket": 90900
+    },
+    {
+      "bits": 24,
+      "meanFalsePositives": 0.010000000000000009,
+      "expectedFalsePositives": 0.005960404872894287,
+      "distinctValues": 99668,
+      "largestBucket": 3,
+      "rowsAloneInBucket": 99337
+    },
+    {
+      "bits": 32,
+      "meanFalsePositives": 0,
+      "expectedFalsePositives": 2.328283153474331E-05,
+      "distinctValues": 99999,
+      "largestBucket": 2,
+      "rowsAloneInBucket": 99998
+    }
+  ]
+}

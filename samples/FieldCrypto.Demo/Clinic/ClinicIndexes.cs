@@ -3,9 +3,9 @@ using FieldCrypto.BlindIndexing;
 namespace FieldCrypto.Demo.Clinic;
 
 /// <summary>
-/// Blind index definitions. Bit lengths come from <see cref="BlindIndexPlanner"/> for a planned 1,000,000 patients
-/// (docs/blind-index.md): national id 16 bits (~15 false positives per lookup, ~15 patients share each index value),
-/// e-mail 16 bits, surname 12 bits (surnames repeat, so a coarser index still returns few candidates per name).
+/// Blind index definitions. National id and e-mail use 16 bits: at 100,000 rows that is ~1.5 false positives per lookup
+/// (measured, docs/benchmarks.md) and at 1,000,000 rows ~15, the planned ceiling. Surnames repeat anyway, so 12 bits
+/// costs little extra filtering and keeps buckets mixed.
 /// </summary>
 public static class ClinicIndexes
 {

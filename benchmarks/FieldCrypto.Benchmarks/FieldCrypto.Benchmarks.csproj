@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <!-- BenchmarkDotNet generates code that does not follow the repository's analyzer rules. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CA1822;CA1515;CA1001;CA2007;CA1707;CA1848;CA1303;CA1869</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FieldCrypto\FieldCrypto.csproj" />
+    <ProjectReference Include="..\..\src\FieldCrypto.Oci\FieldCrypto.Oci.csproj" />
+    <ProjectReference Include="..\..\src\FieldCrypto.DevKms\FieldCrypto.DevKms.csproj" />
+    <ProjectReference Include="..\..\samples\FieldCrypto.Demo\FieldCrypto.Demo.csproj" />
+  </ItemGroup>
+
+</Project>
