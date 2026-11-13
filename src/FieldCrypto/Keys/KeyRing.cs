@@ -284,10 +284,11 @@ public sealed class KeyRing : IDisposable
                 throw new FieldDecryptionException(FieldDecryptionFailure.Malformed, $"Key {id} is not a data encryption key.");
             }
 
+            var kek = ResolveKek(record.KekId);
             byte[] key;
             try
             {
-                key = await UnwrapWith(ResolveKek(record.KekId), record.WrappedKey, new KeyWrapContext(id, record.PurposeName), useAsync, cancellationToken);
+                key = await UnwrapWith(kek, record.WrappedKey, new KeyWrapContext(id, record.PurposeName), useAsync, cancellationToken);
             }
             catch (CryptographicException ex)
             {

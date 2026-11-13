@@ -1,0 +1,94 @@
+{
+  "Ciphertexts": [
+    {
+      "Name": "column-bound national id",
+      "Key": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "DataKeyId": "01890a5d-ac96-774b-bcce-b302099a8057",
+      "Nonce": "000000000000000000000001",
+      "Table": "patients",
+      "Column": "national_id",
+      "RowKey": null,
+      "Plaintext": "10000000146",
+      "Ciphertext": "0101890a5dac96774bbcceb302099a805700000000000000000000000124e68fcc74c4002e3f1a6776d5d3cc7ce39354df9d8703bc5dca64"
+    },
+    {
+      "Name": "row-bound national id",
+      "Key": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "DataKeyId": "01890a5d-ac96-774b-bcce-b302099a8057",
+      "Nonce": "000000000000000000000002",
+      "Table": "patients",
+      "Column": "national_id",
+      "RowKey": "42",
+      "Plaintext": "10000000146",
+      "Ciphertext": "0101890a5dac96774bbcceb302099a8057000000000000000000000002f8411e4d847beae188390aef0eb543bb87dbac1ce273f4f3e943a2"
+    },
+    {
+      "Name": "empty plaintext",
+      "Key": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "DataKeyId": "01890a5d-ac96-774b-bcce-b302099a8057",
+      "Nonce": "ffffffffffffffffffffffff",
+      "Table": "staff",
+      "Column": "email",
+      "RowKey": null,
+      "Plaintext": "",
+      "Ciphertext": "0101890a5dac96774bbcceb302099a8057ffffffffffffffffffffffff93eb71627e1f1e8c79f81cd26974bca2"
+    },
+    {
+      "Name": "turkish text, non-ascii row key",
+      "Key": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "DataKeyId": "01890a5d-ac96-774b-bcce-b302099a8057",
+      "Nonce": "a1a2a3a4a5a6a7a8a9aaabac",
+      "Table": "patients",
+      "Column": "full_name",
+      "RowKey": "\u015F-1",
+      "Plaintext": "\u015E\u00FCkr\u00FC \u00C7a\u011Flayan",
+      "Ciphertext": "0101890a5dac96774bbcceb302099a8057a1a2a3a4a5a6a7a8a9aaabace37144d39f27fdd3aebd3511905da0121bf64464e8c230e2b5443226a92184cd67e2eb"
+    }
+  ],
+  "BlindIndexes": [
+    {
+      "Name": "national id, 16 bits",
+      "RootKey": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "Table": "patients",
+      "Column": "national_id",
+      "Bits": 16,
+      "Normalizer": "digits",
+      "Input": "100 000 001 46",
+      "Normalized": "10000000146",
+      "Value": 6204
+    },
+    {
+      "Name": "national id, 32 bits",
+      "RootKey": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "Table": "patients",
+      "Column": "national_id",
+      "Bits": 32,
+      "Normalizer": "digits",
+      "Input": "10000000146",
+      "Normalized": "10000000146",
+      "Value": 406635890
+    },
+    {
+      "Name": "surname, turkish fold",
+      "RootKey": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "Table": "patients",
+      "Column": "surname",
+      "Bits": 20,
+      "Normalizer": "turkish",
+      "Input": "I\u015EIK",
+      "Normalized": "i\u015Fik",
+      "Value": 203266
+    },
+    {
+      "Name": "email",
+      "RootKey": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "Table": "patients",
+      "Column": "email",
+      "Bits": 24,
+      "Normalizer": "email",
+      "Input": " Ayse.Yilmaz@Example.TEST",
+      "Normalized": "ayse.yilmaz@example.test",
+      "Value": 13687455
+    }
+  ]
+}
